@@ -468,8 +468,20 @@ enum ZeroOneTwo {
 #[derive(Arbitrary, Debug)]
 enum Nested {
     First(SameType),
-    Second(ZeroOneTwo, OneTwo)
+    Second(ZeroOneTwo, OneTwo),
 }
+
+#[derive(Debug, Arbitrary)]
+enum NestedGeneric<S = ()>
+where
+    S: 'static, // FIXME: this won't work when boxed_union is enabled without this bound
+{
+    First(SameType),
+    Second(SecondGeneric<S>),
+}
+
+#[derive(Debug, Arbitrary)]
+struct SecondGeneric<S>(S);
 
 #[test]
 fn asserting_arbitrary() {
@@ -505,4 +517,5 @@ fn asserting_arbitrary() {
     assert_arbitrary::<OneTwo>();
     assert_arbitrary::<ZeroOneTwo>();
     assert_arbitrary::<Nested>();
+    assert_arbitrary::<NestedGeneric>();
 }
